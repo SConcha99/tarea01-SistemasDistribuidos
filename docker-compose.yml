@@ -1,13 +1,6 @@
 version: '3.7'
 
 services:
-  client:
-      build: ./Client/grpc_client
-      depends_on:
-        - postgres
-        - server
-      ports:
-        - "80:3000"
   server:
       build: ./Server/grpc_server
       depends_on:
@@ -22,9 +15,17 @@ services:
       - POSTGRESQL_DATABASE=tiendita
       - ALLOW_EMPTY_PASSWORD=yes
       - POSTGRESQL_PASSWORD=marihuana
-  redis:
+  client:
+    build: ./Client
+    depends_on:
+      - redis-server
+    ports:
+      - "3000:3000"
+  redis-server:
     image: 'bitnami/redis:latest'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     volumes:
       - .Cache/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
