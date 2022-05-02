@@ -2,16 +2,17 @@ version: '3.7'
 
 services:
   client:
-      build: ./<ruta al cliente>
+      build: ./Client/grpc_client
       depends_on:
         - postgres
         - server
       ports:
         - "80:3000"
   server:
-      build: ./<ruta al servidor>
+      build: ./Server/grpc_server
       depends_on:
         - postgres
+        - client
   postgres:
     image: docker.io/bitnami/postgresql:11
     volumes:
