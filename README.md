@@ -1,4 +1,2 @@
 # tarea01-SistemasDistribuidos
-Esta es la rama de sebastian Concha
-
-temp
+Este debe de ser el readme
