@@ -26,4 +26,4 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     volumes:
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - .Cache/redis.conf:/usr/local/etc/redis/redis.conf
