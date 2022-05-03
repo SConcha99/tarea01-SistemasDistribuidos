@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  grcp:
+    build:
+      context: ./GRC
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3001:3001"
+  client:
+    build: 
+      context: ./Client
+    depends_on:
+      - grcp
+    ports:
+      - "3000:3000"
