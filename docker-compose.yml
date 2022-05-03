@@ -21,11 +21,11 @@ services:
       - redis-server
     ports:
       - "3000:3000"
+
   redis-server:
-    image: 'bitnami/redis:latest'
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    volumes:
-      - .Cache/redis.conf:/usr/local/etc/redis/redis.conf
-    ports:
-      - "6379:6379"
+      image: redis:6.2.6
+      command: ["redis-server", "--bind", "redis-server","--maxmemory 2mb","--maxmemory-policy allkeys-lfu"]
+      environment:
+        - ALLOW_EMPTY_PASSWORD=yes
+      ports:
+        - "6379:6379"
