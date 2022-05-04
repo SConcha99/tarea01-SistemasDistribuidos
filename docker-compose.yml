@@ -1,46 +1,32 @@
-version: '3.8'
-services:
-  grpc:
-    build:
-      context: ./Server
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - "3001:3001"
-      - "50051:50051"
+version: '3.7'
 
-    environment:
-      - DATABASE_URL=postgres://postgres:marihuana@db:5432/tiendita  
+services:
+  server:
+    build: ./Server/grpc_server
     depends_on:
       - postgres
-  client:
-    build: 
-      context: ./Client
-    environment:
-      - rpc_host=grpc
-    depends_on:
-      - postgres
-      - grpc
-      - redis-server
-    
-    ports:
-      - "3000:3000"
+      - client
   postgres:
     image: docker.io/bitnami/postgresql:11
     volumes:
-      - ./Database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - .Database/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - POSTGRESQL_USERNAME=postgres
       - POSTGRESQL_DATABASE=tiendita
       - ALLOW_EMPTY_PASSWORD=yes
       - POSTGRESQL_PASSWORD=marihuana
+  client:
+    build: ./Client
+    depends_on:
+      - redis-server
+    restart: always
     ports:
-      - "5432:5432"
+      - "3000:3000"
 
   redis-server:
-    image: redis:6.2.6
-    command: ["redis-server", "--bind", "redis-server","--maxmemory 2mb","--maxmemory-policy allkeys-lru"]
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    ports:
-      - "6379:6379"
+      image: redis:6.2.6
+      command: ["redis-server", "--bind", "redis-server","--maxmemory 2mb","--maxmemory-policy allkeys-lru"]
+      environment:
+        - ALLOW_EMPTY_PASSWORD=yes
+      ports:
+        - "6379:6379"

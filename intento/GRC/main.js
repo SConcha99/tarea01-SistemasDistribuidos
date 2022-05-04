@@ -12,10 +12,9 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/items", async (req, res) => {
-  console.log("request llegada a servido",req);
+  console.log("sdas",req);
   const item = req.query.name;
   if (item) {
-    console.log("Enviando respuesta")
     grpc.GetItem({name: item}, (error, items) => {
         console.log(item)
         if (error){
