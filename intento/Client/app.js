@@ -30,6 +30,25 @@ const port=3000;
 //-------------
 
 // Obtiene todas las keys de redis
+app.get("/cache", async (req, res) => {
+  try {
+      console.log("hola 1")
+      var all_keys = await client.keys(`*`);
+      var response = await Promise.all(all_keys.map(async key => {
+          let new_item = {}
+          let temp = await client.get(key)
+          new_item[key] = JSON.parse(temp)
+          return new_item
+      }))
+      console.log("hola 2", response)
+      res.json(response);
+      console.log("hola 3")
+  } catch (error) {
+      console.error("Error: ", error)
+      return res.status(500).json(error)
+  }
+
+});
 app.get("/keys", async (req, res) => {
   try {
       console.log("hola 1")
@@ -50,45 +69,35 @@ app.get("/keys", async (req, res) => {
 
 });
 
-app.get("/key", async (req, res) => {
-  console.log("Searching for: " + req.query.key);
-  const key = req.query.key;
-  
-  const keys =  client.keys(`*${key}*`);
-  if (keys.length == 0) {
-      console.log("No encontrado en cache");
-      res.send("No encontrado en cache");
-  }
-  else{
-      console.log("Encontrado en cache");
-      
-      console.log(keys);
-      
-      response = await client.get(key);
-
-      console.log(response); 
-
-      res.send({ value : response });
-  
-  }
-});
-
 app.get('/inventory/search', async (req, res) => {
   const item = req.query.q;
-
+  console.log("item",item)
+  var keys = await client.keys(`*${item}*`);
+  console.log("tamaaño",keys.length, keys)
   try {
-      let peticion = await axios.get('http://grcp:3001/items', { params: { name: item }, headers: {
-          'Content-Type': 'application/json',
-      }});
-      if(peticion.status == 200){
-          console.log("Salio bien")
+    //keys == null
+      if (keys.length == 0 ) {
+        //si no esta en el cache
+        let peticion = await axios.get('http://grcp:3001/items', { params: { name: item }, headers: {
+            'Content-Type': 'application/json',
+        }});
+        if(peticion.status == 200){
+            console.log("Salio bien")
+        }
+        let data = peticion.data
+        console.log("aqui esta la peticion",data)
+        let guardado = JSON.stringify(data);
+        await client.set(item, guardado)
+        console.log(await client.get(item))
+        return res.json(data);
+      }else{
+        
+        //SI SE ENCUENTRA EN EL CACHE
+        console.log("entre al cache")
+        let data= await client.get(item)
+        return res.json(data);
+
       }
-      let data = peticion.data
-      //console.log("aqui esta la peticion",data)
-      let guardado = JSON.stringify(data);
-      await client.set(item, guardado)
-      console.log(await client.get(item))
-      return res.json(data);
   } catch (error) {
       console.error("Error: ", error)
       return res.status(500).json(error)
