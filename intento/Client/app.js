@@ -28,27 +28,11 @@ const port=3000;
 //FUNCION QUE HACE EL LLAMADO AL SERVIDOR
 
 //-------------
-
-// Obtiene todas las keys de redis
-app.get("/cache", async (req, res) => {
-  try {
-      console.log("hola 1")
-      var all_keys = await client.keys(`*`);
-      var response = await Promise.all(all_keys.map(async key => {
-          let new_item = {}
-          let temp = await client.get(key)
-          new_item[key] = JSON.parse(temp)
-          return new_item
-      }))
-      console.log("hola 2", response)
-      res.json(response);
-      console.log("hola 3")
-  } catch (error) {
-      console.error("Error: ", error)
-      return res.status(500).json(error)
-  }
-
+app.get("/reset", async (req, res) => {
+  await client.flushAll();
+  res.send("Cache eliminado");
 });
+
 app.get("/keys", async (req, res) => {
   try {
       console.log("hola 1")
