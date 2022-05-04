@@ -17,6 +17,7 @@ services:
     depends_on:
       - postgres
       - grcp
+      - redis-server
     
     ports:
       - "3000:3000"
@@ -31,3 +32,11 @@ services:
       - POSTGRESQL_PASSWORD=marihuana
     ports:
       - "5432:5432"
+
+  redis-server:
+    image: redis:6.2.6
+    command: ["redis-server", "--bind", "redis-server","--maxmemory 2mb","--maxmemory-policy allkeys-lru"]
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6379:6379"
