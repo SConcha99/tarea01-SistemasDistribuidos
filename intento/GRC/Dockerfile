@@ -5,6 +5,7 @@ WORKDIR /app
 COPY . .
 
 RUN apk add --update --no-cache alpine-sdk \
-&& npm install 
+&& npm install \
+&& npm install pg
 
 CMD ["npm", "start"]

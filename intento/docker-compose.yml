@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  grcp:
+    build:
+      context: ./GRC
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgres://postgres:marihuana@db:5432/tiendita  
+    depends_on:
+      - postgres
+  client:
+    build: 
+      context: ./Client
+    depends_on:
+      - postgres
+      - grcp
+    
+    ports:
+      - "3000:3000"
+  postgres:
+    image: docker.io/bitnami/postgresql:11
+    volumes:
+      - ./Database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_DATABASE=tiendita
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_PASSWORD=marihuana
+    ports:
+      - "5432:5432"
