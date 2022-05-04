@@ -1,12 +1,14 @@
 version: '3.8'
 services:
-  grcp:
+  grpc:
     build:
       context: ./GRC
       dockerfile: Dockerfile
     restart: always
     ports:
       - "3001:3001"
+      - "50051:50051"
+
     environment:
       - DATABASE_URL=postgres://postgres:marihuana@db:5432/tiendita  
     depends_on:
@@ -14,9 +16,11 @@ services:
   client:
     build: 
       context: ./Client
+    environment:
+      - rpc_host=grpc
     depends_on:
       - postgres
-      - grcp
+      - grpc
       - redis-server
     
     ports:

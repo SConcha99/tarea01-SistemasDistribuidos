@@ -15,5 +15,4 @@ RUN npm install redis
 # Bundle app source
 COPY . .
 
-EXPOSE 8080
 CMD [ "node", "app.js" ]
